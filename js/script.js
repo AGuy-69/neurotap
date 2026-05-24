@@ -331,11 +331,30 @@ function drawChart(dataPoints) {
     });
 }
 
-// --- LOCAL STORAGE ---
+// --- LOCAL & FIREBASE STORAGE ---
 function saveData(acc, rt) {
+    const record = { 
+        date: new Date().toISOString(), 
+        accuracy: acc, 
+        avgRt: rt 
+    };
+
+    // 1. Keep Local Storage (Useful for offline fallback or local history)
     const history = JSON.parse(localStorage.getItem('sart_history') || '[]');
-    history.push({ date: new Date().toISOString(), accuracy: acc, avgRt: rt });
+    history.push(record);
     localStorage.setItem('sart_history', JSON.stringify(history));
+
+    // 2. Push to Firebase Realtime Database
+    // This creates a unique ID for every new test result
+    const resultsRef = db.ref('sart_results');
+    
+    resultsRef.push(record)
+        .then(() => {
+            console.log("Results successfully synced to Firebase.");
+        })
+        .catch((error) => {
+            console.error("Firebase sync failed:", error);
+        });
 }
 
 // --- BACKGROUND PARTICLES ---
