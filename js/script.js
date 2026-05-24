@@ -1,8 +1,3 @@
-/**
- * NEURO-FOCUS SART ENGINE
- * Pure Vanilla JavaScript implementation
- */
-
 // --- STATE MANAGEMENT ---
 const state = {
     view: 'home',
@@ -250,7 +245,7 @@ function processResults() {
     document.getElementById('ai-insight').innerText = insight;
 
     drawChart(rts);
-    saveData(accuracy, avgRt);
+    saveData(accuracy, avgRt, commissionErrors, omissionErrors, rts);
 }
 // --- PURE JS CANVAS CHART ---
 function drawChart(dataPoints) {
@@ -333,25 +328,28 @@ function drawChart(dataPoints) {
 }
 
 // --- LOCAL & FIREBASE STORAGE ---
-function saveData(acc, rt) {
+function saveData(accuracy, avgRt, commissionErrors, omissionErrors, rts) {
+// Build the expanded record object
     const record = { 
         date: new Date().toISOString(), 
         accuracy: acc, 
-        avgRt: rt 
+        avgRt: rt,
+        commissionErrors: ce,
+        omissionErrors: oe,
+        reactionTimes: rtsArray // This saves the timeline graph data
     };
 
-    // 1. Keep Local Storage (Useful for offline fallback or local history)
+    // 1. Save to Local Storage
     const history = JSON.parse(localStorage.getItem('sart_history') || '[]');
     history.push(record);
     localStorage.setItem('sart_history', JSON.stringify(history));
 
     // 2. Push to Firebase Realtime Database
-    // This creates a unique ID for every new test result
-    const resultsRef = db.ref('sart_results');
+    const resultsRef = firebase.database().ref('sart_results');
     
     resultsRef.push(record)
         .then(() => {
-            console.log("Results successfully synced to Firebase.");
+            console.log("Results (including errors and timeline) successfully synced to Firebase.");
         })
         .catch((error) => {
             console.error("Firebase sync failed:", error);
