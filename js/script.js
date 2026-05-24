@@ -104,12 +104,13 @@ soundToggle.addEventListener('click', () => {
 const stimEl = document.getElementById('stimulus');
 const progFill = document.getElementById('progress-fill');
 
-// 1. Create a SINGLE global input handler
 const handleTestInput = (e) => {
     // Only register Spacebar or Touch
     if ((e.type === 'keydown' && e.code === 'Space') || e.type === 'touchstart') {
-        // Ignore if test isn't running, or if user already reacted this trial
-        if (!state.test.isActive || state.test.hasReacted) return;
+        
+        // ADDED SAFEGUARD: || !state.test.currentRecord
+        // Ignore if test isn't running, user already reacted, or trial hasn't fully started
+        if (!state.test.isActive || state.test.hasReacted || !state.test.currentRecord) return;
         
         state.test.hasReacted = true;
         const rt = performance.now() - state.test.startTime;
