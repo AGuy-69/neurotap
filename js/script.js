@@ -329,14 +329,14 @@ function drawChart(dataPoints) {
 
 // --- LOCAL & FIREBASE STORAGE ---
 function saveData(accuracy, avgRt, commissionErrors, omissionErrors, rts) {
-// Build the expanded record object
+    // Build the expanded record object using the correct function parameters
     const record = { 
         date: new Date().toISOString(), 
-        accuracy: acc, 
-        avgRt: rt,
-        commissionErrors: ce,
-        omissionErrors: oe,
-        reactionTimes: rtsArray // This saves the timeline graph data
+        accuracy: accuracy, 
+        avgRt: avgRt,
+        commissionErrors: commissionErrors,
+        omissionErrors: omissionErrors,
+        reactionTimes: rts // This saves the timeline graph data
     };
 
     // 1. Save to Local Storage
